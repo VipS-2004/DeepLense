@@ -84,6 +84,35 @@ If you are new to this project, the following order helps avoid common setup iss
 Following this order should make the setup process much smoother.
 
 
+---
+
+## High-level Training Flow (Conceptual Overview)
+
+This section provides a high-level explanation of how the training pipeline works, before diving into detailed commands and implementation.
+
+The goal of this subproject is to learn meaningful visual representations from gravitational lensing images **without using labels**, and then evaluate how useful these representations are for lens vs non-lens classification when only limited labeled data is available.
+
+### Step 1: Self-Supervised Pretraining (No Labels)
+
+- A Vision Transformer (ViT) model is trained using self-supervised learning methods such as **DINO**, **SimSiam**, or **iBOT**.
+- During this stage, the model sees all available training images **without any labels**.
+- The objective is to learn general visual patterns such as arcs, rings, and brightness structures commonly found in gravitational lensing images.
+
+This step helps the model build strong feature representations without relying on annotated data.
+
+### Step 2: Fine-tuning with Limited Labels
+
+- After self-supervised pretraining, a small classification head is added on top of the pretrained model.
+- The model is then fine-tuned using only a **small fraction of labeled images**.
+- This simulates real-world scenarios where labeled data is scarce or expensive to obtain.
+
+### Step 3: Evaluation and Comparison
+
+- The performance of the fine-tuned model is evaluated on a held-out test set.
+- Results are compared against a fully supervised baseline trained only on labeled data.
+- This comparison helps measure how much self-supervised learning improves performance in low-label settings.
+
+Overall, this pipeline demonstrates how self-supervised learning can reduce dependence on labeled data while still achieving strong classification performance.
 
 
 
