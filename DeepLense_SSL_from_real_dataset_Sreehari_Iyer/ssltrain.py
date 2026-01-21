@@ -89,6 +89,10 @@ class ImageDataset(Dataset):
         return image, self.label[idx]
 
 def main():
+    # ------------------------------------------------------------
+    # 1. Load configuration files and set up experiment environment
+    # ------------------------------------------------------------
+
     # Ensure a config file is provided as a command-line argument
     if len(sys.argv) not in [2,3]:
         print("Usage: python main.py <config_file> <optional_default_config_file>")
@@ -152,8 +156,11 @@ def main():
     #--------------------------------------------------------------------------------------------------------
 
     
-    #--------------------------------------------------------------------------------------------------------
-    # compute mean and std based on the training dataset
+    # ------------------------------------------------------------
+    # 2. Compute dataset statistics (mean & std) from training data
+    #    Used for normalization in SSL augmentations
+    # ------------------------------------------------------------
+
     data_path = args["input"]["data path"]
     indices = None
     with open(args["input"]["indices"], "rb") as f:
@@ -221,7 +228,11 @@ def main():
     #--------------------------------------------------------------------------------------------------------
 
         
-    # initialize ssl training object
+    # ------------------------------------------------------------
+    # 3. Initialize SSL training method (DINO / SimSiam / iBOT)
+    #    This block selects and configures the chosen SSL algorithm
+    # ------------------------------------------------------------
+
     ssl_training = None
     if args["experiment"]["ssl_training"] is None:
         print("`ssl_training` which specifies the training method cannot be `None`. Exiting.")
