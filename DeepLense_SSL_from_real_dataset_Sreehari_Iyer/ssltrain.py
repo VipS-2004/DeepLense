@@ -1,3 +1,31 @@
+"""
+ssltrain.py
+
+High-level training script for self-supervised learning (SSL) on real-world
+gravitational lensing images using Vision Transformers (ViTs).
+
+This script supports multiple SSL methods:
+- DINO
+- iBOT
+- SimSiam
+
+Overall training flow:
+1. Load and merge YAML configuration files
+2. Set random seeds and experiment directories
+3. Initialize Vision Transformer backbone(s)
+   - Student network (always)
+   - Teacher network (for DINO / iBOT)
+4. Load dataset paths using predefined train/val/test indices
+5. Compute dataset mean and standard deviation for normalization
+6. Build SSL-specific data augmentations
+7. Initialize the selected SSL training framework
+8. Run SSL pretraining
+9. Save the learned representation network
+
+This file is intentionally modular so that new SSL methods,
+augmentations, or backbones can be added with minimal changes.
+"""
+
 import os
 import sys
 import logging
