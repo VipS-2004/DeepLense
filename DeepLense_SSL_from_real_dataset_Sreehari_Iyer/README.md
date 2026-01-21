@@ -3,6 +3,119 @@ This repository contains the code for my ongoing project with <a href = "https:/
 
 This project focuses on evaluating of self-supervised learning techniques with Transformers utilizing real-world strong gravitational lensing dataset. The learned representations are then evaluated on the downstream task to classify lens and non-lens images. <br>
 
+
+## Beginner Notes: Dataset & Configuration Setup (For New Contributors)
+
+This section clarifies setup details that may be confusing when running this project for the first time.
+
+This project was originally developed and tested in environments like **Kaggle**, so some paths and file references may not work out of the box when running locally. The notes below explain how things are organized and what you may need to change.
+
+---
+
+### 1. Dataset Channels (g, r, i)
+
+Each image in the dataset contains three channels:
+
+- **g** – green filter  
+- **r** – red filter  
+- **i** – infrared filter  
+
+These channels are stored together as a single image and are handled automatically by the data loader.  
+You **do not** need to split or preprocess them manually.
+
+---
+
+### 2. What is `indices.pkl`?
+
+The file `indices.pkl` contains predefined **train / validation / test splits** for the dataset.
+
+- It specifies which images are used for training and evaluation  
+- It helps keep experiments reproducible  
+- You do not need to generate this file yourself  
+
+📁 The file is available inside the `input/` directory.
+
+---
+
+### 3. Configuration Files (`.yaml`)
+
+Training in this project is **config-driven**, meaning most settings are defined in `.yaml` files.
+
+- Example configuration files are provided in the `configs/` folder
+
+When the README says *“the config file is expected to be a `.yaml` file”*, it means:
+
+1. Choose one of the provided example `.yaml` files  
+2. Update it according to your local setup  
+
+The most important fields to modify are:
+
+- `data_path` → path to the dataset on your system  
+- `indices` → path to the `indices.pkl` file  
+
+**Example (local setup):**
+```yaml
+data_path: /home/user/datasets/real_lenses_dataset
+indices: /home/user/DeepLense/input/indices.pkl
+
+### 4. Kaggle vs Local Paths
+
+Some notebooks contain hard-coded paths such as:
+    /kaggle/input/real-lenses-dataset
+
+These paths are specific to Kaggle and **will not work on a local machine**.
+
+If you are running the project outside Kaggle, make sure to:
+
+1. Replace Kaggle-specific paths with valid local paths, **or**
+2. Update the paths through the configuration (`.yaml`) files where applicable
+
+---
+
+### 5. Suggested Starting Order for New Contributors
+
+If you are new to this project, the following order helps avoid common setup issues:
+
+1. Read this README once fully  
+2. Open the `configs/` folder and inspect an example `.yaml` file  
+3. Update the dataset and `indices.pkl` paths in the config file  
+4. Then open the notebooks inside the `notebooks/` folder  
+
+Following this order should make the setup process much smoother.
+
+
+---
+
+## High-level Training Flow (Conceptual Overview)
+
+This section provides a high-level explanation of how the training pipeline works, before diving into detailed commands and implementation.
+
+The goal of this subproject is to learn meaningful visual representations from gravitational lensing images **without using labels**, and then evaluate how useful these representations are for lens vs non-lens classification when only limited labeled data is available.
+
+### Step 1: Self-Supervised Pretraining (No Labels)
+
+- A Vision Transformer (ViT) model is trained using self-supervised learning methods such as **DINO**, **SimSiam**, or **iBOT**.
+- During this stage, the model sees all available training images **without any labels**.
+- The objective is to learn general visual patterns such as arcs, rings, and brightness structures commonly found in gravitational lensing images.
+
+This step helps the model build strong feature representations without relying on annotated data.
+
+### Step 2: Fine-tuning with Limited Labels
+
+- After self-supervised pretraining, a small classification head is added on top of the pretrained model.
+- The model is then fine-tuned using only a **small fraction of labeled images**.
+- This simulates real-world scenarios where labeled data is scarce or expensive to obtain.
+
+### Step 3: Evaluation and Comparison
+
+- The performance of the fine-tuned model is evaluated on a held-out test set.
+- Results are compared against a fully supervised baseline trained only on labeled data.
+- This comparison helps measure how much self-supervised learning improves performance in low-label settings.
+
+Overall, this pipeline demonstrates how self-supervised learning can reduce dependence on labeled data while still achieving strong classification performance.
+
+
+
 Before training, download the lenses dataset from <a href = "https://drive.google.com/drive/folders/17DSF-uz6ke_koU3O36n61Q3IrQ7rjrfk?usp=sharing"> drive </a> and the nonlenses dataset from <a href = "https://drive.google.com/drive/folders/1qZ5kB7PrmmwqH_4b3LFenFSJagOLuIeY?usp=sharing"> drive </a> and place them in lenses and nonlenses subdirectories respectively. <br>
 The train dataset contains 2333 lens images and 1530 non-lens images. The validation dataset contains 259 lens images and 170 non-lens images. The test dataset contains 458 lens images and 300 non-lens images. Each image has 3 channels, g, r and i, corresponding to green, red and infrared filters respectively. Each image has 3 channels, g, r and i, corresponding to green, red and infrared filters respectively. The images are center cropped to 32 × 32 pixel as this empirically resulted in better prediction accuracy. The models are evaluated for the downstream task of classifying images into lenses and non-lenses on the held out test split of the dataset.<br>
 To understand how well SSL works with different fractions of labelled and unlabelled data, the model is pre-trained through self supervision on the entire train data and then finetuned on the labelled fraction of the train data and compared with supervised baseline trained only on that labeled fraction. This simulates the real world scenario where only a fraction of dataset may have associated labels.  <br>
