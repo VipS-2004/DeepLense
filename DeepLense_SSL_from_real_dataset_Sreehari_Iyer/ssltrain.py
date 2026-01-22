@@ -111,6 +111,25 @@ def main():
     update_dict(args, config_args)
 
     assert args["input"]["data path"] is not None, "Input data path cannot be `None`"
+# ------------------------------------------------------------
+# Validate dataset paths early for clearer errors
+# ------------------------------------------------------------
+
+data_path = args["input"]["data path"]
+indices_path = args["input"]["indices"]
+
+if not os.path.exists(data_path):
+    raise FileNotFoundError(
+        f"Dataset path '{data_path}' not found. "
+        "Please update the 'input.data path' field in your config YAML."
+    )
+
+if not os.path.exists(indices_path):
+    raise FileNotFoundError(
+        f"indices.pkl file not found at '{indices_path}'. "
+        "Please ensure indices.pkl exists and update the config YAML if needed."
+    )
+
     args["experiment"]["output_dir"] = f"{args['experiment']['output_dir']}-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
     if not os.path.exists(args["experiment"]["output_dir"]):
         os.makedirs(args["experiment"]["output_dir"])
