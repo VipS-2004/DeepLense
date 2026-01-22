@@ -7,6 +7,35 @@ Before training, download the lenses dataset from <a href = "https://drive.googl
 The train dataset contains 2333 lens images and 1530 non-lens images. The validation dataset contains 259 lens images and 170 non-lens images. The test dataset contains 458 lens images and 300 non-lens images. Each image has 3 channels, g, r and i, corresponding to green, red and infrared filters respectively. Each image has 3 channels, g, r and i, corresponding to green, red and infrared filters respectively. The images are center cropped to 32 × 32 pixel as this empirically resulted in better prediction accuracy. The models are evaluated for the downstream task of classifying images into lenses and non-lenses on the held out test split of the dataset.<br>
 To understand how well SSL works with different fractions of labelled and unlabelled data, the model is pre-trained through self supervision on the entire train data and then finetuned on the labelled fraction of the train data and compared with supervised baseline trained only on that labeled fraction. This simulates the real world scenario where only a fraction of dataset may have associated labels.  <br>
 
+## Quick Start (Local Setup)
+
+This section explains how to run the SSL code locally without relying on Kaggle-specific paths.
+
+### 1. Download the dataset
+Download the real gravitational lensing datasets from the links provided above (lens and non-lens images).
+
+### 2. Expected folder structure
+After downloading, organize the data as follows:
+
+input/
+ ├── lenses/
+ ├── nonlenses/
+ └── indices.pkl
+
+### What is indices.pkl?
+The `indices.pkl` file contains precomputed train, validation, and test split indices.
+It ensures that all experiments use the same data splits for fair comparison.
+The training scripts assume this file exists and will fail if it is missing.
+
+### Kaggle vs Local Paths
+Some notebooks and scripts use Kaggle-specific paths such as `/kaggle/input/...`.
+These paths will not work when running locally or on Colab.
+When running locally, update all dataset paths to point to your local `input/` directory or the paths specified in `config.yaml`.
+
+### 3. Update config.yaml
+Before training, update dataset paths in `config.yaml` to match your local folder structure.
+
+
 # Supervised Learning Baseline
 Following is the evaluation results for supervised baselines computed over a held-out test dataset. 
 |Backbone | # labelled data for <br> training/fine-tuning | Accuracy | AUC |
