@@ -45,6 +45,9 @@ from datetime import datetime
 from selfsupervised.augmentations import get_dino_augmentations, get_simsiam_augmentations
 from functools import partial
 
+from selfsupervised.utils.validation import check_paths
+
+
 from typing import List, Dict, Union, Callable 
 import pickle
 
@@ -109,6 +112,9 @@ def main():
     # will be updated from the parsed config yaml file
     config_args = safe_load(open(config_file, "r"))
     update_dict(args, config_args)
+
+    # Preflight checks (fail early before any GPU work)
+    check_paths(args)
 
     assert args["input"]["data path"] is not None, "Input data path cannot be `None`"
     args["experiment"]["output_dir"] = f"{args['experiment']['output_dir']}-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
